@@ -1,32 +1,36 @@
 import csv
+from pathlib import Path
 import numpy as np
 import os
 import logging
 
-# Настройка логирования
+# Setup logging
 logging.basicConfig(level=logging.INFO)
 
-# Размер матрицы
+# Constants
+OUTPUT_FOLDER = "data"
+BASE_DIR = Path(__file__).parent
 MATRIX_SIZE = 300
 
 def get_file_path(file_name):
-    """Возвращает полный путь к файлу в директории 'data'."""
+    """Returns the full path to the file in the 'data' directory."""
     
-    return os.path.join("data", file_name)
+    return os.path.join(BASE_DIR, OUTPUT_FOLDER, file_name)
 
 def create_matrix():
-    """Создает пустую матрицу фиксированного размера."""
+    """Creates an empty matrix of fixed size."""
     
     matrix = np.zeros((MATRIX_SIZE, MATRIX_SIZE), dtype=np.int32)
     logging.info(f"Matrix of size {MATRIX_SIZE}x{MATRIX_SIZE} created.")
     return matrix
 
 def data_parsing(matrix, file_name):
-    """Парсит данные из CSV файла и заполняет матрицу."""
+    """Parses data from the CSV file and fills the matrix."""
     
     path_to_file = get_file_path(file_name)
+    print(path_to_file)
     
-    # Проверяем существование файла
+    # Check if the file exists
     if not os.path.exists(path_to_file):
         logging.error(f"File {path_to_file} does not exist.")
         return None
@@ -38,7 +42,7 @@ def data_parsing(matrix, file_name):
                 cell = row[0]
                 id_value, cell_value = map(int, cell.split('|'))
                 
-                # Рассчитываем индексы строки и столбца
+                # Calculate row and column indices
                 row_index = (id_value - 1) // MATRIX_SIZE
                 col_index = (id_value - 1) % MATRIX_SIZE
                 
@@ -50,7 +54,7 @@ def data_parsing(matrix, file_name):
         return None
 
 def writing_data(data, file_name):
-    """Записывает данные матрицы в CSV файл."""
+    """Writes matrix data to a CSV file."""
     
     path_to_file = get_file_path(file_name)
     
@@ -63,7 +67,7 @@ def writing_data(data, file_name):
         logging.error(f"Error writing data to file {file_name}: {e}")
 
 def main():
-    """Основная функция."""
+    """Main function."""
     
     matrix = create_matrix()
     data = data_parsing(matrix, 'source__300.csv')
@@ -74,7 +78,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-    
-
-
