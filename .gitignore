@@ -1,5 +1,4 @@
 .venv
-output.csv
 .DS_Store
 .pyc
 .Python
@@ -19,3 +18,7 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+__pycache__
+#Project
+universal_script.py
+output.csv

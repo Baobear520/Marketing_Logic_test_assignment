@@ -1,16 +1,14 @@
 import csv
-from pathlib import Path
 import numpy as np
 import os
 import logging
 
+from constansts import BASE_DIR, OUTPUT_FOLDER, MATRIX_SIZE
+
+
 # Setup logging
 logging.basicConfig(level=logging.INFO)
 
-# Constants
-OUTPUT_FOLDER = "data"
-BASE_DIR = Path(__file__).parent
-MATRIX_SIZE = 300
 
 def get_file_path(file_name):
     """Returns the full path to the file in the 'data' directory."""

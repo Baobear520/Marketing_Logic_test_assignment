@@ -1,100 +1,74 @@
 import random
+import math
 
-class Group:
-    """ Class to represent a group """
-    
-    def __init__(self, group_id):
-        self.group_id = group_id
-        self.members_list = []
-    
-    def add_member(self, member):
-        self.members_list.append(member)
+class GroupAssignment:
+    """ A class to represent group assingment """
+
+    def __init__(self, num_people=20, group_size=10):
+        self.num_people = num_people
+        self.group_size = group_size
+        self.group1 = []
+        self.group2 = []
+
+    def assign_groups(self):
+        """Randomly assigns people into two groups."""
         
-    def print_members(self):
-        print(f"Group {self.group_id} members: {self.members_list}")
+        people = list(range(1, self.num_people + 1))
+        random.shuffle(people)
+        self.group1 = people[:self.group_size]
+        self.group2 = people[self.group_size:]
 
-class Person:
-    """ Class to represent a person """
-    
-    def __init__(self, id):
-        self.id = id
-
-    def __repr__(self) -> str:
-        return f"Member №{self.id}"
-
-class Selection:
-    """ Class to represent results of seeding people into groups """
-    
-    def __init__(self, number_of_people, number_of_groups):
-        self._number_of_people = number_of_people
-        self._number_of_groups = number_of_groups
-
-    def create_objects(self, number, cls):
+    def check_same_group(self, person1, person2):
+        """Checks if person1 and person2 are in the same group."""
         
-        """ Create objects (either Person or Group) """
-        
-        return [cls(n) for n in range(1, number + 1)]
-    
-    def setup(self):
-        """ Set up participants and groups """
-        
-        participants = self.create_objects(self._number_of_people, Person)
-        groups = self.create_objects(self._number_of_groups, Group)
-        return participants, groups
+        return (person1 in self.group1 and person2 in self.group1) or (person1 in self.group2 and person2 in self.group2)
 
-    def seed_participants(self):
-        """ Randomly distribute participants across groups """
-        
-        participants, groups = self.setup()
-        group_size = len(participants) // len(groups)  # Ensure balanced distribution
-        
-        for group in groups:
-            while len(group.members_list) < group_size and participants:
-                member = participants.pop(random.randint(0, len(participants) - 1))
-                group.add_member(member)
 
-        return groups
+class ProbabilityChecker:
+    """ A class to represent results of probability checks """
 
-class Simulation:
-    """ Class to handle the simulation logic """
-    
-    def __init__(self, trials, number_of_participants, number_of_groups):
+    def __init__(self, group_assignment, trials=10000):
+        self.group_assignment = group_assignment
         self.trials = trials
-        self.number_of_participants = number_of_participants
-        self.number_of_groups = number_of_groups
 
-    def is_in_the_same_group(self, member_id1, member_id2, groups):
-        """ Check if two members are in the same group """
+    def run_simulation(self, person1=19, person2=20):
+        """Runs simulation to estimate the probability."""
         
-        for group in groups:
-            member_ids = [member.id for member in group.members_list]
-            if member_id1 in member_ids and member_id2 in member_ids:
-                return True
-        return False
-
-    def run_simulation(self):
-        """ Run the simulation for a set number of trials """
         success_count = 0
-
         for _ in range(self.trials):
-            selection = Selection(self.number_of_participants, self.number_of_groups)
-            groups = selection.seed_participants()
-
-            # Check if members 19 and 20 are in the same group
-            if self.is_in_the_same_group(19, 20, groups):
+            self.group_assignment.assign_groups()
+            if self.group_assignment.check_same_group(person1, person2):
                 success_count += 1
-
         probability = success_count / self.trials
         return probability
 
 
+    def calculate_theoretical_probability(self):
+        """Calculates theoretical probability using combinatorics."""
+        
+        total_combinations = math.comb(self.group_assignment.num_people, self.group_assignment.group_size)
+        favorable_combinations = math.comb(self.group_assignment.num_people - 2, self.group_assignment.group_size - 2)
+        probability = 2 * favorable_combinations / total_combinations
+        return probability
+
+
+    def compare_probabilities(self, person1=19, person2=20):
+        """Compares simulation and theoretical probabilities."""
+        
+        simulation_prob = self.run_simulation(person1, person2)
+        theoretical_prob = self.calculate_theoretical_probability()
+        return simulation_prob, theoretical_prob
+
+
+
 if __name__ == "__main__":
-    number_of_participants = 20
-    number_of_groups = 2
-    trials = 10000  # Number of simulation trials
+    # Create an instance of GroupAssignment
+    group_assignment = GroupAssignment()
 
-    # Run the simulation
-    simulation = Simulation(trials, number_of_participants, number_of_groups)
-    probability = simulation.run_simulation()
+    # Create an instance of ProbabilityChecker and run the checks
+    checker = ProbabilityChecker(group_assignment, trials=10000)
 
-    print(f"Probability that 19 and 20 are in the same group: {probability}")
+    # Compare probabilities
+    simulated_probability, theoretical_probability = checker.compare_probabilities()
+    print(f"Simulated probability: {simulated_probability:.4f}")
+    print(f"Theoretical probability: {theoretical_probability:.4f}")
