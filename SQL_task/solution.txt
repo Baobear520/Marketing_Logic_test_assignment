@@ -1,0 +1,28 @@
+Наиболее простым и оптимальным был бы запрос вида:
+
+SELECT 
+    date, 
+    COUNT(order_id) AS number_of_orders, 
+    COUNT(DISTINCT user_id) AS number_of_customers, 
+    SUM(price) AS total_cost 
+FROM ML  
+GROUP BY date 
+ORDER BY date ASC;
+
+Запрос без использования подзапросов и структуры COUNT (DISTINCT...):
+
+SELECT 
+    ml1.date, 
+    COUNT(ml1.order_id) AS total_orders, 
+    SUM(ml1.price) AS total_price,
+    COUNT(CASE 
+            WHEN ml1.user_id = ml2.user_id THEN 1 
+            ELSE NULL 
+         END) AS number_of_users
+FROM ML ml1
+LEFT JOIN ML ml2
+ON ml1.date = ml2.date 
+AND ml1.user_id = ml2.user_id 
+AND ml1.order_id = ml2.order_id
+GROUP BY ml1.date
+ORDER BY ml1.date ASC;
