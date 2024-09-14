@@ -28,7 +28,7 @@ def data_parsing(matrix, file_name):
     """Parses data from the CSV file and fills the matrix."""
     
     path_to_file = get_file_path(file_name)
-    print(path_to_file)
+    
     
     # Check if the file exists
     if not os.path.exists(path_to_file):
