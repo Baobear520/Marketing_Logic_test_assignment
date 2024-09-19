@@ -14,11 +14,11 @@ ORDER BY date ASC;
 SELECT 
     ml1.date, 
     COUNT(ml1.order_id) AS total_orders, 
-    SUM(ml1.price) AS total_price,
     COUNT(CASE 
             WHEN ml1.user_id = ml2.user_id THEN 1 
             ELSE NULL 
-         END) AS number_of_users
+         END) AS number_of_users,
+    SUM(ml1.price) AS total_price
 FROM ML ml1
 LEFT JOIN ML ml2
 ON ml1.date = ml2.date 
